@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Victoria · A Programmer's Bad Day — Past Simple & Continuous</title>
+    <style>
+      :root{
+        --purple:#6c3483; --purple-l:#ebdef0; --blue:#1a5276; --blue-l:#d6eaf8;
+        --green:#1e8449; --green-l:#d5f5e3; --red:#c0392b; --red-l:#fadbd8;
+        --orange:#ca6f1e; --orange-l:#fdebd0; --grey:#f4f6f7; --dark:#212f3c;
+      }
+      *{box-sizing:border-box; margin:0; padding:0;}
+      body{font-family:'Segoe UI',Arial,sans-serif; background:#f3eef7; color:var(--dark); line-height:1.55;}
+      header{background:linear-gradient(135deg,#6c3483,#a569bd); color:#fff; padding:24px 20px; text-align:center;}
+      header h1{font-size:1.6em;}
+      header p{opacity:.9; margin-top:6px;}
+      nav{display:flex; flex-wrap:wrap; justify-content:center; gap:6px; background:#fff; padding:10px; position:sticky; top:0; z-index:10; box-shadow:0 2px 6px rgba(0,0,0,.12);}
+      nav button{border:none; background:var(--grey); padding:8px 14px; border-radius:20px; cursor:pointer; font-size:.9em; font-weight:600; color:var(--dark);}
+      nav button.active{background:var(--purple); color:#fff;}
+      main{max-width:880px; margin:0 auto; padding:20px;}
+      section{display:none; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,.08); animation:fade .3s;}
+      section.visible{display:block;}
+      @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+      h2{color:var(--purple); margin-bottom:4px;}
+      h3{color:var(--purple);}
+      .time{display:inline-block; background:var(--orange-l); color:var(--orange); font-size:.8em; font-weight:700; padding:2px 10px; border-radius:12px; margin-bottom:14px;}
+      .box{background:var(--grey); border-left:4px solid var(--purple); padding:14px 16px; border-radius:0 8px 8px 0; margin:14px 0;}
+      .card{background:var(--purple-l); border-radius:10px; padding:14px 16px; margin:10px 0;}
+      .card b{color:var(--purple);}
+      button.action{background:var(--purple); color:#fff; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; margin-top:8px;}
+      button.action:hover{background:#512e5f;}
+      .opt{display:block; width:100%; text-align:left; margin:6px 0; padding:10px 14px; border-radius:8px; border:2px solid #d5dbdb; background:#fff; cursor:pointer; font-size:1em;}
+      .opt:hover{border-color:var(--purple);}
+      .opt.correct{background:var(--green-l); border-color:var(--green);}
+      .opt.wrong{background:var(--red-l); border-color:var(--red);}
+      .gap input, .gap select{padding:6px 10px; border:2px solid #d5dbdb; border-radius:6px; font-size:1em; margin:0 4px;}
+      .gap input.ok, .gap select.ok{border-color:var(--green); background:var(--green-l);}
+      .gap input.no, .gap select.no{border-color:var(--red); background:var(--red-l);}
+      .match-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:14px 0;}
+      .match-item{padding:12px; border-radius:8px; border:2px solid #d5dbdb; background:#fff; cursor:pointer; text-align:center; font-weight:600;}
+      .match-item.sel{border-color:var(--orange); background:var(--orange-l);}
+      .match-item.done{border-color:var(--green); background:var(--green-l); cursor:default;}
+      .match-item.shake{animation:shake .3s;}
+      @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+      .tag{display:inline-block; font-size:.75em; font-weight:700; padding:2px 8px; border-radius:10px; margin-right:6px;}
+      .tag.t{background:var(--blue-l); color:var(--blue);}
+      .tag.d{background:var(--green-l); color:var(--green);}
+      .score{font-size:1.2em; font-weight:700; color:var(--purple); margin-top:14px;}
+      .transcript{display:none; background:#fdfefe; border:1px dashed #aab7b8; padding:16px; border-radius:8px; margin-top:10px; font-size:.95em;}
+      .transcript.shown{display:block;}
+      .transcript p{margin:6px 0;}
+      .say{background:#fff; border:2px solid var(--purple); color:var(--purple); border-radius:50%; width:34px; height:34px; cursor:pointer; font-size:1em; vertical-align:middle; margin-left:8px;}
+      .say:hover{background:var(--purple-l);}
+      .say.playing{background:var(--purple); color:#fff;}
+      .flash{perspective:1000px; cursor:pointer; margin:12px 0; min-height:170px;}
+      .flash-inner{position:relative; width:100%; min-height:170px; transition:transform .5s; transform-style:preserve-3d;}
+      .flash.flipped .flash-inner{transform:rotateY(180deg);}
+      .flash-front,.flash-back{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:12px; padding:18px; display:flex; flex-direction:column; justify-content:center;}
+      .flash-front{background:var(--red-l); border:2px solid var(--red);}
+      .flash-front .label{font-size:.75em; font-weight:700; color:var(--red); margin-bottom:8px;}
+      .flash-front p{font-size:1.1em; font-weight:600;}
+      .flash-back{background:var(--green-l); border:2px solid var(--green); transform:rotateY(180deg);}
+      .flash-back .label{font-size:.75em; font-weight:700; color:var(--green); margin-bottom:6px;}
+      .flash-back .fix{font-weight:700; margin-bottom:6px;}
+      .flash-back .why{font-size:.92em;}
+      table{width:100%; border-collapse:collapse; margin:12px 0;}
+      th,td{border:1px solid #d5dbdb; padding:8px 10px; text-align:left;}
+      th{background:var(--purple-l); color:var(--purple);}
+      footer{text-align:center; padding:18px; color:#7b8a8b; font-size:.85em;}
+    </style>
+</head>
+<body>
+
+<header>
+  <h1>A Programmer's Bad Day 💻☕</h1>
+  <p>Victoria · Elementary · Past Simple &amp; Past Continuous · 60 minutes</p>
+</header>
+
+<nav id="nav">
+  <button data-s="s1" class="active">1. Warm-up</button>
+  <button data-s="s2">2. Vocabulary</button>
+  <button data-s="s3">3. Phrasal Verbs</button>
+  <button data-s="s4">4. Grammar</button>
+  <button data-s="s5">5. Find the Mistake</button>
+  <button data-s="s6">6. Listening</button>
+  <button data-s="s7">7. Speaking</button>
+  <button data-s="s8">8. Wrap-up Quiz</button>
+</nav>
+
+<main>
+
+<!-- ============ 1. WARM-UP ============ -->
+<section id="s1" class="visible">
+  <h2>1 · Warm-up: Yesterday...</h2>
+  <span class="time">⏱ 8 min</span>
+  <div class="box">Let's talk about the past! Answer with a full sentence: <i>"Yesterday I..."</i></div>
+
+  <h3>A · Talk!</h3>
+  <div class="card"><b>🎲 Question generator</b>
+    <p id="warmQ" style="margin-top:8px; font-size:1.1em;">Click the button to start!</p>
+    <button class="action" onclick="nextWarm()">Next question ➜</button>
+  </div>
+
+  <h3 style="margin-top:18px;">B · Irregular verbs race ⚡</h3>
+  <p>Write the past simple. How fast can you do it?</p>
+  <p class="gap">go ➜ <input data-a="went" size="7"> &nbsp;&nbsp; have ➜ <input data-a="had" size="7"> &nbsp;&nbsp; write ➜ <input data-a="wrote" size="7"></p>
+  <p class="gap">make ➜ <input data-a="made" size="7"> &nbsp;&nbsp; break ➜ <input data-a="broke" size="7"> &nbsp;&nbsp; find ➜ <input data-a="found" size="7"></p>
+  <p class="gap">drink ➜ <input data-a="drank" size="7"> &nbsp;&nbsp; lose ➜ <input data-a="lost" size="7"> &nbsp;&nbsp; send ➜ <input data-a="sent" size="7"></p>
+  <button class="action" onclick="checkGaps('s1')">Check answers ✓</button>
+</section>
+
+<!-- ============ 2. VOCABULARY ============ -->
+<section id="s2">
+  <h2>2 · Vocabulary: Words that go together</h2>
+  <span class="time">⏱ 8 min</span>
+  <div class="box">Don't learn words alone — learn the pairs! These work at the office AND at home.</div>
+
+  <div class="card"><b>1. fix a bug / fix a problem</b> — arreglar un error / un problema<br>
+  <i>"I <b>fixed a</b> very strange <b>bug</b> yesterday."</i> <span class="tag t">tech</span>
+  <button class="say" data-say="Fix a bug. I fixed a very strange bug yesterday.">🔊</button></div>
+
+  <div class="card"><b>2. make a mistake</b> — cometer un error (¡no "do a mistake"!)<br>
+  <i>"I <b>made a mistake</b> and deleted the wrong file."</i> <span class="tag t">tech</span> <span class="tag d">daily</span>
+  <button class="say" data-say="Make a mistake. I made a mistake and deleted the wrong file.">🔊</button></div>
+
+  <div class="card"><b>3. take a break</b> — tomar un descanso<br>
+  <i>"I was tired, so I <b>took a break</b> and drank some mate."</i> <span class="tag d">daily</span>
+  <button class="say" data-say="Take a break. I was tired, so I took a break and drank some mate.">🔊</button></div>
+
+  <div class="card"><b>4. have a meeting / have a call</b> — tener una reunión / una llamada<br>
+  <i>"I <b>was having a call</b> when the internet died."</i> <span class="tag t">tech</span> <span class="tag d">daily</span>
+  <button class="say" data-say="Have a meeting. I was having a call when the internet died.">🔊</button></div>
+
+  <h3 style="margin-top:18px;">A · Match the halves</h3>
+  <p>Click one item on the left, then its partner on the right.</p>
+  <div class="match-grid" id="matchVocab"></div>
+
+  <h3 style="margin-top:18px;">B · Complete the sentences (past simple!)</h3>
+  <p class="gap">1. Yesterday I <input data-a="fixed" size="7"> a bug in ten minutes. I'm a genius!</p>
+  <p class="gap">2. Sorry, I <input data-a="made" size="7"> a mistake with the date of the meeting.</p>
+  <p class="gap">3. At 11 o'clock we <input data-a="took" size="7"> a break and ate some cookies.</p>
+  <p class="gap">4. I <input data-a="had" size="7"> a meeting with my team this morning.</p>
+  <button class="action" onclick="checkGaps('s2')">Check answers ✓</button>
+</section>
+
+<!-- ============ 3. PHRASAL VERBS ============ -->
+<section id="s3">
+  <h2>3 · Phrasal Verbs for every day</h2>
+  <span class="time">⏱ 6 min</span>
+
+  <div class="card"><b>1. log in / log out</b> — iniciar / cerrar sesión<br>
+  <i>"I <b>logged in</b>, but the system was very slow."</i>
+  <button class="say" data-say="Log in. I logged in, but the system was very slow.">🔊</button></div>
+
+  <div class="card"><b>2. turn on / turn off</b> — encender / apagar<br>
+  <i>"I <b>turned off</b> my laptop and went for a walk."</i>
+  <button class="say" data-say="Turn on. Turn off. I turned off my laptop and went for a walk.">🔊</button></div>
+
+  <div class="card"><b>3. look for</b> — buscar<br>
+  <i>"I <b>was looking for</b> the error when my boss called me."</i>
+  <button class="say" data-say="Look for. I was looking for the error when my boss called me.">🔊</button></div>
+
+  <h3 style="margin-top:18px;">Choose the correct phrasal verb</h3>
+  <div id="pvQuiz"></div>
+</section>
+
+<!-- ============ 4. GRAMMAR ============ -->
+<section id="s4">
+  <h2>4 · Grammar: Past Simple vs Past Continuous</h2>
+  <span class="time">⏱ 12 min</span>
+
+  <div class="box">
+  <b>Past simple</b> = a finished action ✔️ &nbsp; <i>"I <b>fixed</b> the bug."</i><br>
+  <b>Past continuous</b> = an action in progress at a moment in the past 🔄 &nbsp; <b>was / were + verb-ing</b> &nbsp; <i>"I <b>was fixing</b> the bug."</i><br><br>
+  Together — a long action interrupted by a short action:<br>
+  <i>"I <b>was testing</b> the code <b>when</b> the laptop <b>crashed</b>."</i> 🔄⚡<br>
+  (was testing = long action in progress · crashed = short action that interrupts it)</div>
+
+  <table>
+    <tr><th></th><th>Past simple</th><th>Past continuous</th></tr>
+    <tr><td>✔️ +</td><td>I work<b>ed</b> / I <b>went</b></td><td>I <b>was working</b> / They <b>were working</b></td></tr>
+    <tr><td>❌ −</td><td>I <b>didn't</b> work</td><td>I <b>wasn't</b> working</td></tr>
+    <tr><td>❓ ?</td><td><b>Did</b> you work?</td><td><b>Were</b> you working?</td></tr>
+  </table>
+
+  <h3>A · Choose the correct form</h3>
+  <div id="grQuiz"></div>
+
+  <h3 style="margin-top:18px;">B · Complete the story</h3>
+  <p>Use past simple or past continuous:</p>
+  <p class="gap">Yesterday at 9 a.m., I <select data-a="was drinking"><option></option><option>drank</option><option>was drinking</option></select> coffee and reading my emails.</p>
+  <p class="gap">Suddenly, my computer <select data-a="crashed"><option></option><option>crashed</option><option>was crashing</option></select>.</p>
+  <p class="gap">While I <select data-a="was restarting"><option></option><option>restarted</option><option>was restarting</option></select> it, my phone rang.</p>
+  <p class="gap">It was my boss. He <select data-a="asked"><option></option><option>asked</option><option>was asking</option></select>: "Is the new feature ready?"</p>
+  <button class="action" onclick="checkGaps('s4')">Check answers ✓</button>
+
+  <div class="box" style="border-left-color:var(--green);"><b>Your turn (speaking):</b> Tell me about a real day with a problem at work. What were you doing when it happened? What did you do after?</div>
+</section>
+
+<!-- ============ 5. FIND THE MISTAKE ============ -->
+<section id="s5">
+  <h2>5 · Find the Mistake 🔍</h2>
+  <span class="time">⏱ 6 min</span>
+  <div class="box">Each card has a sentence with <b>one mistake</b>. Say what the mistake is and correct it. Then <b>click the card</b> to check!</div>
+  <div id="flashCards"></div>
+</section>
+
+<!-- ============ 6. LISTENING ============ -->
+<section id="s6">
+  <h2>6 · Listening: Victoria's Terrible Monday</h2>
+  <span class="time">⏱ 10 min</span>
+  <div class="box"><b>Situation:</b> A programmer called Vicky tells her friend about a terrible Monday. Listen and answer the questions.<br><br>
+  <b>Before listening:</b> What can go wrong on a Monday? Guess three things!</div>
+
+  <div class="card" style="text-align:center;">
+    <b>🎧 Listen to Vicky's story</b><br>
+    <div style="margin-top:8px;"><iframe width="300" height="60" src="https://vocaroo.com/embed/13J3bu82iPzw?autoplay=0" frameborder="0" allow="autoplay" style="max-width:100%;"></iframe><br><a href="https://vocaroo.com/13J3bu82iPzw" target="_blank">📍 Link</a></div>
+  </div>
+
+  <button class="action" onclick="toggleTranscript()">👩‍🏫 Show / hide transcript (teacher)</button>
+  <div class="transcript" id="transcript">
+    <p><b>Sofi:</b> Hi Vicky! How was your Monday?</p>
+    <p><b>Vicky:</b> Terrible! Don't ask... OK, ask.</p>
+    <p><b>Sofi:</b> Ha! What happened?</p>
+    <p><b>Vicky:</b> Well, at eight o'clock I was drinking my first coffee and reading my emails. Everything was normal. Then, at nine, I logged in to start working... and the system was down.</p>
+    <p><b>Sofi:</b> Oh no. What did you do?</p>
+    <p><b>Vicky:</b> I turned my laptop off and on again — the classic! But it didn't work. So I called Martín, from my team.</p>
+    <p><b>Sofi:</b> And what was he doing?</p>
+    <p><b>Vicky:</b> He was having breakfast! But he helped me. While we were looking for the problem, we found a big bug in the new code.</p>
+    <p><b>Sofi:</b> A bug? Who made the mistake?</p>
+    <p><b>Vicky:</b> Me! I wrote that code on Friday at six p.m. Lesson number one: don't write code on Friday at six p.m.</p>
+    <p><b>Sofi:</b> Ha ha! So, did you fix it?</p>
+    <p><b>Vicky:</b> Yes, we fixed the bug at midday. Then I took a break, drank more coffee... and the internet died. I'm not joking!</p>
+    <p><b>Sofi:</b> Poor Vicky! What a day!</p>
+    <p><b>Vicky:</b> Yes. At ten p.m. I was watching a series and eating pizza — the best part of my Monday!</p>
+  </div>
+
+  <h3 style="margin-top:18px;">Comprehension questions</h3>
+  <div id="listQuiz"></div>
+
+  <div class="box" style="border-left-color:var(--green);"><b>After listening (speaking):</b> Did you ever have a day like Vicky's? What happened? Use the past!</div>
+</section>
+
+<!-- ============ 7. SPEAKING ============ -->
+<section id="s7">
+  <h2>7 · Speaking Games</h2>
+  <span class="time">⏱ 8 min</span>
+
+  <h3>A · What were you doing at...? 🕐</h3>
+  <div class="box">The teacher clicks the button. Answer with the past continuous: <i>"I was..."</i> Then add one more detail in past simple!</div>
+  <div class="card"><b>🎲 Time machine</b>
+    <p id="timeQ" style="margin-top:8px; font-size:1.1em;">Click the button to start!</p>
+    <button class="action" onclick="nextTime()">Next time ➜</button>
+  </div>
+
+  <h3 style="margin-top:18px;">B · Two truths and a lie 🤥</h3>
+  <div class="box">Tell me <b>three sentences</b> about your last weekend in the past simple. Two are true, one is a lie. I will guess the lie — then we change roles!<br><br>
+  <i>Example: "On Saturday I ran 10 kilometres. / I ate sushi. / I watched a horror film."</i></div>
+</section>
+
+<!-- ============ 8. WRAP-UP ============ -->
+<section id="s8">
+  <h2>8 · Wrap-up Quiz</h2>
+  <span class="time">⏱ 5 min</span>
+  <div class="box">Last challenge of the day. Choose the correct answer!</div>
+  <div id="wrapQuiz"></div>
+  <div class="score" id="wrapScore"></div>
+  <div class="box" style="border-left-color:var(--green); margin-top:16px;"><b>Final questions (speaking):</b><br>
+  1. What's the difference between "I fixed the bug" and "I was fixing the bug"?<br>
+  2. "Make a mistake" or "do a mistake" — which is correct?<br>
+  3. Tell me one sentence about today using the past simple!</div>
+</section>
+
+</main>
+
+<footer>Made for Victoria · Elementary · Past Simple &amp; Past Continuous</footer>
+
+<script>
+/* ---------- Navigation ---------- */
+const navBtns = document.querySelectorAll('#nav button');
+navBtns.forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('visible'));
+  navBtns.forEach(x => x.classList.remove('active'));
+  document.getElementById(b.dataset.s).classList.add('visible');
+  b.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}));
+
+/* ---------- Warm-up questions ---------- */
+const warmQs = [
+  "What did you do yesterday after work?",
+  "What did you have for dinner last night?",
+  "Did you write any code yesterday? What was it for?",
+  "What time did you wake up this morning?",
+  "Did you watch anything good last weekend?",
+  "When was the last time you laughed a lot? Why?",
+  "Did you go out last weekend or stay at home?",
+  "What music did you listen to today?"
+];
+let wi = -1;
+function nextWarm(){
+  wi = (wi + 1) % warmQs.length;
+  document.getElementById('warmQ').textContent = "💬 " + warmQs[wi];
+}
+
+/* ---------- Time machine (speaking) ---------- */
+const times = [
+  "Yesterday at 7 a.m. ☀️",
+  "Yesterday at 1 p.m. 🍽️",
+  "Yesterday at 6 p.m. 🌆",
+  "Last night at 10 p.m. 🌙",
+  "Last Saturday at 11 a.m. 🧉",
+  "Last Sunday at 9 p.m. 📺",
+  "This morning at 8:30 ☕",
+  "Last Friday at 5 p.m. 🎉"
+];
+let ti = -1;
+function nextTime(){
+  ti = (ti + 1) % times.length;
+  document.getElementById('timeQ').textContent = "🕐 What were you doing... " + times[ti] + "?";
+}
+
+/* ---------- Text-to-speech (🔊 buttons) ---------- */
+let enVoice = null;
+function pickVoice(){
+  const vs = window.speechSynthesis ? speechSynthesis.getVoices() : [];
+  enVoice = vs.find(v => v.lang === 'en-US') || vs.find(v => v.lang.startsWith('en')) || null;
+}
+if(window.speechSynthesis){
+  pickVoice();
+  speechSynthesis.onvoiceschanged = pickVoice;
+}
+document.querySelectorAll('.say').forEach(btn => {
+  btn.addEventListener('click', () => {
+    if(!window.speechSynthesis){ alert('Sorry, this browser does not support speech.'); return; }
+    speechSynthesis.cancel();
+    document.querySelectorAll('.say.playing').forEach(b => b.classList.remove('playing'));
+    const u = new SpeechSynthesisUtterance(btn.dataset.say);
+    u.lang = 'en-US';
+    if(enVoice) u.voice = enVoice;
+    u.rate = 0.85;
+    btn.classList.add('playing');
+    u.onend = () => btn.classList.remove('playing');
+    u.onerror = () => btn.classList.remove('playing');
+    speechSynthesis.speak(u);
+  });
+});
+
+/* ---------- Transcript toggle ---------- */
+function toggleTranscript(){
+  document.getElementById('transcript').classList.toggle('shown');
+}
+
+/* ---------- Matching (vocabulary) ---------- */
+const pairs = [
+  ["fix","a bug"],
+  ["make","a mistake"],
+  ["take","a break"],
+  ["have","a meeting"]
+];
+const left = pairs.map((p,i)=>({t:p[0], k:i}));
+const right = pairs.map((p,i)=>({t:p[1], k:i})).sort(()=>Math.random()-.5);
+const grid = document.getElementById('matchVocab');
+let sel = null;
+function makeItem(o, side){
+  const d = document.createElement('div');
+  d.className = 'match-item';
+  d.textContent = o.t;
+  d.dataset.k = o.k; d.dataset.side = side;
+  d.addEventListener('click', ()=>{
+    if(d.classList.contains('done')) return;
+    if(!sel){ sel = d; d.classList.add('sel'); return; }
+    if(sel === d){ d.classList.remove('sel'); sel = null; return; }
+    if(sel.dataset.side === d.dataset.side){ sel.classList.remove('sel'); sel = d; d.classList.add('sel'); return; }
+    if(sel.dataset.k === d.dataset.k){
+      sel.classList.remove('sel'); sel.classList.add('done'); d.classList.add('done');
+    } else {
+      d.classList.add('shake'); sel.classList.add('shake');
+      const a = sel;
+      setTimeout(()=>{ d.classList.remove('shake'); a.classList.remove('shake','sel'); }, 350);
+    }
+    sel = null;
+  });
+  return d;
+}
+for(let i=0;i<4;i++){ grid.appendChild(makeItem(left[i],'L')); grid.appendChild(makeItem(right[i],'R')); }
+
+/* ---------- Gap checking ---------- */
+function norm(s){ return s.trim().toLowerCase().replace(/\s+/g,' '); }
+function checkGaps(sectionId){
+  const sec = document.getElementById(sectionId);
+  const fields = sec.querySelectorAll('.gap input, .gap select');
+  fields.forEach(f=>{
+    const ok = norm(f.value) === norm(f.dataset.a);
+    f.classList.toggle('ok', ok);
+    f.classList.toggle('no', !ok && f.value.trim() !== '');
+    if(!ok && f.value.trim() === ''){ f.classList.remove('ok','no'); }
+  });
+}
+
+/* ---------- Generic MC quiz builder ---------- */
+function buildQuiz(containerId, questions, scoreId){
+  const c = document.getElementById(containerId);
+  let answered = 0, score = 0;
+  questions.forEach((q,qi)=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.style.background = '#fdfefe';
+    card.style.border = '1px solid #d5dbdb';
+    const p = document.createElement('p');
+    p.innerHTML = '<b>' + (qi+1) + '.</b> ' + q.q;
+    card.appendChild(p);
+    let done = false;
+    q.o.forEach((opt,oi)=>{
+      const b = document.createElement('button');
+      b.className = 'opt';
+      b.textContent = opt;
+      b.addEventListener('click', ()=>{
+        if(done) return;
+        done = true; answered++;
+        if(oi === q.a){ b.classList.add('correct'); score++; }
+        else {
+          b.classList.add('wrong');
+          card.querySelectorAll('.opt')[q.a].classList.add('correct');
+        }
+        if(scoreId && answered === questions.length){
+          document.getElementById(scoreId).textContent =
+            '🏆 Score: ' + score + ' / ' + questions.length +
+            (score === questions.length ? ' — Excellent!' : score >= questions.length*0.7 ? ' — Well done!' : ' — Let\'s review together!');
+        }
+      });
+      card.appendChild(b);
+    });
+    c.appendChild(card);
+  });
+}
+
+/* ---------- Phrasal verbs quiz ---------- */
+buildQuiz('pvQuiz', [
+  {q:"I can't ______ — I forgot my password again!", o:["log in","turn on","look for"], a:0},
+  {q:"It's late. ______ the lights and let's go home.", o:["Log out","Turn off","Look for"], a:1},
+  {q:"I was ______ my keys when I found 500 pesos in my jacket!", o:["logging in","turning off","looking for"], a:2}
+]);
+
+/* ---------- Grammar quiz ---------- */
+buildQuiz('grQuiz', [
+  {q:"I ______ TV when you called me.", o:["watched","was watching"], a:1},
+  {q:"Yesterday I ______ three bugs. A good day!", o:["fixed","was fixing"], a:0},
+  {q:"______ you ______ at 10 p.m. last night?", o:["Did / sleep","Were / sleeping"], a:1},
+  {q:"While I ______ lunch, my phone rang.", o:["had","was having"], a:1},
+  {q:"She ______ to the meeting because she was sick.", o:["didn't go","wasn't going"], a:0}
+]);
+
+/* ---------- Find the Mistake flashcards ---------- */
+const mistakes = [
+  {bad:"I was work at nine o'clock yesterday.",
+   fix:"I was working at nine o'clock yesterday.",
+   why:"Past continuous = was/were + verb-ING. Always add -ing: was workING."},
+  {bad:"She didn't went to the office on Friday.",
+   fix:"She didn't go to the office on Friday.",
+   why:"After DIDN'T, use the base verb: didn't GO (el pasado ya está en 'didn't')."},
+  {bad:"I did a big mistake in the code.",
+   fix:"I made a big mistake in the code.",
+   why:"The collocation is MAKE a mistake, never 'do a mistake'."},
+  {bad:"What did you doing when the system crashed?",
+   fix:"What were you doing when the system crashed?",
+   why:"Past continuous question = WERE/WAS + subject + -ing: What WERE you DOING?"},
+  {bad:"I maked coffee and taked a break.",
+   fix:"I made coffee and took a break.",
+   why:"MAKE and TAKE are irregular: made, took. ¡No llevan -ed!"},
+  {bad:"While we was looking for the bug, Martín found it.",
+   fix:"While we were looking for the bug, Martín found it.",
+   why:"WE, YOU, THEY ➜ were. WAS is only for I, he, she, it."}
+];
+const fc = document.getElementById('flashCards');
+mistakes.forEach((m,i)=>{
+  const card = document.createElement('div');
+  card.className = 'flash';
+  card.innerHTML =
+    '<div class="flash-inner">' +
+      '<div class="flash-front"><div class="label">❌ CARD ' + (i+1) + ' — Find the mistake, then click to flip</div><p>"' + m.bad + '"</p></div>' +
+      '<div class="flash-back"><div class="label">✅ CORRECT VERSION</div><div class="fix">"' + m.fix + '"</div><div class="why">' + m.why + '</div></div>' +
+    '</div>';
+  card.addEventListener('click', ()=> card.classList.toggle('flipped'));
+  fc.appendChild(card);
+});
+
+/* ---------- Listening quiz ---------- */
+buildQuiz('listQuiz', [
+  {q:"What was Vicky doing at eight o'clock?", o:["She was writing code","She was drinking coffee and reading emails","She was having a meeting"], a:1},
+  {q:"What happened at nine o'clock?", o:["The system was down","Her laptop broke","Her boss called"], a:0},
+  {q:"What was Martín doing when Vicky called him?", o:["He was working","He was sleeping","He was having breakfast"], a:2},
+  {q:"Who made the mistake in the code?", o:["Martín","Vicky","The boss"], a:1},
+  {q:"When did they fix the bug?", o:["At midday","On Friday","At ten p.m."], a:0},
+  {q:"What was Vicky doing at ten p.m.?", o:["She was fixing another bug","She was watching a series and eating pizza","She was talking to Sofi"], a:1}
+]);
+
+/* ---------- Wrap-up quiz ---------- */
+buildQuiz('wrapQuiz', [
+  {q:"Yesterday I ______ a bug in five minutes.", o:["fixed","was fixing","fix"], a:0},
+  {q:"I ______ a shower when the phone rang.", o:["had","was having","have"], a:1},
+  {q:"Don't worry, everybody ______ mistakes!", o:["does","takes","makes"], a:2},
+  {q:"I'm tired. Let's ______ a break.", o:["make","take","do"], a:1},
+  {q:"I ______ to the system but it was very slow.", o:["logged in","turned on","looked for"], a:0},
+  {q:"______ you working at home yesterday?", o:["Did","Was","Were"], a:2},
+  {q:"He ______ answer my message last night.", o:["didn't","wasn't","weren't"], a:0},
+  {q:"While I ______ for my glasses, I found my old phone.", o:["looked","was looking","look"], a:1}
+], 'wrapScore');
+</script>
+</body>
+</html>
