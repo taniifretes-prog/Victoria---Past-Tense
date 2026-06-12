@@ -1,74 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Victoria · A Programmer's Bad Day — Past Simple & Continuous</title>
-    <style>
-      :root{
-        --purple:#6c3483; --purple-l:#ebdef0; --blue:#1a5276; --blue-l:#d6eaf8;
-        --green:#1e8449; --green-l:#d5f5e3; --red:#c0392b; --red-l:#fadbd8;
-        --orange:#ca6f1e; --orange-l:#fdebd0; --grey:#f4f6f7; --dark:#212f3c;
-      }
-      *{box-sizing:border-box; margin:0; padding:0;}
-      body{font-family:'Segoe UI',Arial,sans-serif; background:#f3eef7; color:var(--dark); line-height:1.55;}
-      header{background:linear-gradient(135deg,#6c3483,#a569bd); color:#fff; padding:24px 20px; text-align:center;}
-      header h1{font-size:1.6em;}
-      header p{opacity:.9; margin-top:6px;}
-      nav{display:flex; flex-wrap:wrap; justify-content:center; gap:6px; background:#fff; padding:10px; position:sticky; top:0; z-index:10; box-shadow:0 2px 6px rgba(0,0,0,.12);}
-      nav button{border:none; background:var(--grey); padding:8px 14px; border-radius:20px; cursor:pointer; font-size:.9em; font-weight:600; color:var(--dark);}
-      nav button.active{background:var(--purple); color:#fff;}
-      main{max-width:880px; margin:0 auto; padding:20px;}
-      section{display:none; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,.08); animation:fade .3s;}
-      section.visible{display:block;}
-      @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
-      h2{color:var(--purple); margin-bottom:4px;}
-      h3{color:var(--purple);}
-      .time{display:inline-block; background:var(--orange-l); color:var(--orange); font-size:.8em; font-weight:700; padding:2px 10px; border-radius:12px; margin-bottom:14px;}
-      .box{background:var(--grey); border-left:4px solid var(--purple); padding:14px 16px; border-radius:0 8px 8px 0; margin:14px 0;}
-      .card{background:var(--purple-l); border-radius:10px; padding:14px 16px; margin:10px 0;}
-      .card b{color:var(--purple);}
-      button.action{background:var(--purple); color:#fff; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; margin-top:8px;}
-      button.action:hover{background:#512e5f;}
-      .opt{display:block; width:100%; text-align:left; margin:6px 0; padding:10px 14px; border-radius:8px; border:2px solid #d5dbdb; background:#fff; cursor:pointer; font-size:1em;}
-      .opt:hover{border-color:var(--purple);}
-      .opt.correct{background:var(--green-l); border-color:var(--green);}
-      .opt.wrong{background:var(--red-l); border-color:var(--red);}
-      .gap input, .gap select{padding:6px 10px; border:2px solid #d5dbdb; border-radius:6px; font-size:1em; margin:0 4px;}
-      .gap input.ok, .gap select.ok{border-color:var(--green); background:var(--green-l);}
-      .gap input.no, .gap select.no{border-color:var(--red); background:var(--red-l);}
-      .match-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:14px 0;}
-      .match-item{padding:12px; border-radius:8px; border:2px solid #d5dbdb; background:#fff; cursor:pointer; text-align:center; font-weight:600;}
-      .match-item.sel{border-color:var(--orange); background:var(--orange-l);}
-      .match-item.done{border-color:var(--green); background:var(--green-l); cursor:default;}
-      .match-item.shake{animation:shake .3s;}
-      @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
-      .tag{display:inline-block; font-size:.75em; font-weight:700; padding:2px 8px; border-radius:10px; margin-right:6px;}
-      .tag.t{background:var(--blue-l); color:var(--blue);}
-      .tag.d{background:var(--green-l); color:var(--green);}
-      .score{font-size:1.2em; font-weight:700; color:var(--purple); margin-top:14px;}
-      .transcript{display:none; background:#fdfefe; border:1px dashed #aab7b8; padding:16px; border-radius:8px; margin-top:10px; font-size:.95em;}
-      .transcript.shown{display:block;}
-      .transcript p{margin:6px 0;}
-      .say{background:#fff; border:2px solid var(--purple); color:var(--purple); border-radius:50%; width:34px; height:34px; cursor:pointer; font-size:1em; vertical-align:middle; margin-left:8px;}
-      .say:hover{background:var(--purple-l);}
-      .say.playing{background:var(--purple); color:#fff;}
-      .flash{perspective:1000px; cursor:pointer; margin:12px 0; min-height:170px;}
-      .flash-inner{position:relative; width:100%; min-height:170px; transition:transform .5s; transform-style:preserve-3d;}
-      .flash.flipped .flash-inner{transform:rotateY(180deg);}
-      .flash-front,.flash-back{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:12px; padding:18px; display:flex; flex-direction:column; justify-content:center;}
-      .flash-front{background:var(--red-l); border:2px solid var(--red);}
-      .flash-front .label{font-size:.75em; font-weight:700; color:var(--red); margin-bottom:8px;}
-      .flash-front p{font-size:1.1em; font-weight:600;}
-      .flash-back{background:var(--green-l); border:2px solid var(--green); transform:rotateY(180deg);}
-      .flash-back .label{font-size:.75em; font-weight:700; color:var(--green); margin-bottom:6px;}
-      .flash-back .fix{font-weight:700; margin-bottom:6px;}
-      .flash-back .why{font-size:.92em;}
-      table{width:100%; border-collapse:collapse; margin:12px 0;}
-      th,td{border:1px solid #d5dbdb; padding:8px 10px; text-align:left;}
-      th{background:var(--purple-l); color:var(--purple);}
-      footer{text-align:center; padding:18px; color:#7b8a8b; font-size:.85em;}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Victoria · A Programmer's Bad Day — Past Simple & Continuous</title>
+<style>
+  :root{
+    --purple:#6c3483; --purple-l:#ebdef0; --blue:#1a5276; --blue-l:#d6eaf8;
+    --green:#1e8449; --green-l:#d5f5e3; --red:#c0392b; --red-l:#fadbd8;
+    --orange:#ca6f1e; --orange-l:#fdebd0; --grey:#f4f6f7; --dark:#212f3c;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Segoe UI',Arial,sans-serif; background:#f3eef7; color:var(--dark); line-height:1.55;}
+  header{background:linear-gradient(135deg,#6c3483,#a569bd); color:#fff; padding:24px 20px; text-align:center;}
+  header h1{font-size:1.6em;}
+  header p{opacity:.9; margin-top:6px;}
+  nav{display:flex; flex-wrap:wrap; justify-content:center; gap:6px; background:#fff; padding:10px; position:sticky; top:0; z-index:10; box-shadow:0 2px 6px rgba(0,0,0,.12);}
+  nav button{border:none; background:var(--grey); padding:8px 14px; border-radius:20px; cursor:pointer; font-size:.9em; font-weight:600; color:var(--dark);}
+  nav button.active{background:var(--purple); color:#fff;}
+  main{max-width:880px; margin:0 auto; padding:20px;}
+  section{display:none; background:#fff; border-radius:12px; padding:24px; box-shadow:0 2px 8px rgba(0,0,0,.08); animation:fade .3s;}
+  section.visible{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  h2{color:var(--purple); margin-bottom:4px;}
+  h3{color:var(--purple);}
+  .time{display:inline-block; background:var(--orange-l); color:var(--orange); font-size:.8em; font-weight:700; padding:2px 10px; border-radius:12px; margin-bottom:14px;}
+  .box{background:var(--grey); border-left:4px solid var(--purple); padding:14px 16px; border-radius:0 8px 8px 0; margin:14px 0;}
+  .card{background:var(--purple-l); border-radius:10px; padding:14px 16px; margin:10px 0;}
+  .card b{color:var(--purple);}
+  button.action{background:var(--purple); color:#fff; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-weight:600; margin-top:8px;}
+  button.action:hover{background:#512e5f;}
+  .opt{display:block; width:100%; text-align:left; margin:6px 0; padding:10px 14px; border-radius:8px; border:2px solid #d5dbdb; background:#fff; cursor:pointer; font-size:1em;}
+  .opt:hover{border-color:var(--purple);}
+  .opt.correct{background:var(--green-l); border-color:var(--green);}
+  .opt.wrong{background:var(--red-l); border-color:var(--red);}
+  .gap input, .gap select{padding:6px 10px; border:2px solid #d5dbdb; border-radius:6px; font-size:1em; margin:0 4px;}
+  .gap input.ok, .gap select.ok{border-color:var(--green); background:var(--green-l);}
+  .gap input.no, .gap select.no{border-color:var(--red); background:var(--red-l);}
+  .match-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:14px 0;}
+  .match-item{padding:12px; border-radius:8px; border:2px solid #d5dbdb; background:#fff; cursor:pointer; text-align:center; font-weight:600;}
+  .match-item.sel{border-color:var(--orange); background:var(--orange-l);}
+  .match-item.done{border-color:var(--green); background:var(--green-l); cursor:default;}
+  .match-item.shake{animation:shake .3s;}
+  @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-6px);}75%{transform:translateX(6px);}}
+  .tag{display:inline-block; font-size:.75em; font-weight:700; padding:2px 8px; border-radius:10px; margin-right:6px;}
+  .tag.t{background:var(--blue-l); color:var(--blue);}
+  .tag.d{background:var(--green-l); color:var(--green);}
+  .score{font-size:1.2em; font-weight:700; color:var(--purple); margin-top:14px;}
+  .transcript{display:none; background:#fdfefe; border:1px dashed #aab7b8; padding:16px; border-radius:8px; margin-top:10px; font-size:.95em;}
+  .transcript.shown{display:block;}
+  .transcript p{margin:6px 0;}
+  .say{background:#fff; border:2px solid var(--purple); color:var(--purple); border-radius:50%; width:34px; height:34px; cursor:pointer; font-size:1em; vertical-align:middle; margin-left:8px;}
+  .say:hover{background:var(--purple-l);}
+  .say.playing{background:var(--purple); color:#fff;}
+  .flash{perspective:1000px; cursor:pointer; margin:12px 0; min-height:170px;}
+  .flash-inner{position:relative; width:100%; min-height:170px; transition:transform .5s; transform-style:preserve-3d;}
+  .flash.flipped .flash-inner{transform:rotateY(180deg);}
+  .flash-front,.flash-back{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:12px; padding:18px; display:flex; flex-direction:column; justify-content:center;}
+  .flash-front{background:var(--red-l); border:2px solid var(--red);}
+  .flash-front .label{font-size:.75em; font-weight:700; color:var(--red); margin-bottom:8px;}
+  .flash-front p{font-size:1.1em; font-weight:600;}
+  .flash-back{background:var(--green-l); border:2px solid var(--green); transform:rotateY(180deg);}
+  .flash-back .label{font-size:.75em; font-weight:700; color:var(--green); margin-bottom:6px;}
+  .flash-back .fix{font-weight:700; margin-bottom:6px;}
+  .flash-back .why{font-size:.92em;}
+  table{width:100%; border-collapse:collapse; margin:12px 0;}
+  th,td{border:1px solid #d5dbdb; padding:8px 10px; text-align:left;}
+  th{background:var(--purple-l); color:var(--purple);}
+  footer{text-align:center; padding:18px; color:#7b8a8b; font-size:.85em;}
+</style>
 </head>
 <body>
 
@@ -116,19 +116,19 @@
   <span class="time">⏱ 8 min</span>
   <div class="box">Don't learn words alone — learn the pairs! These work at the office AND at home.</div>
 
-  <div class="card"><b>1. fix a bug / fix a problem</b> — arreglar un error / un problema<br>
+  <div class="card"><b>1. fix a bug / fix a problem</b> — to repair an error, or to solve an issue<br>
   <i>"I <b>fixed a</b> very strange <b>bug</b> yesterday."</i> <span class="tag t">tech</span>
   <button class="say" data-say="Fix a bug. I fixed a very strange bug yesterday.">🔊</button></div>
 
-  <div class="card"><b>2. make a mistake</b> — cometer un error (¡no "do a mistake"!)<br>
+  <div class="card"><b>2. make a mistake</b> — to do something wrong by accident (never "do a mistake"!)<br>
   <i>"I <b>made a mistake</b> and deleted the wrong file."</i> <span class="tag t">tech</span> <span class="tag d">daily</span>
   <button class="say" data-say="Make a mistake. I made a mistake and deleted the wrong file.">🔊</button></div>
 
-  <div class="card"><b>3. take a break</b> — tomar un descanso<br>
+  <div class="card"><b>3. take a break</b> — to stop working for a short time to rest<br>
   <i>"I was tired, so I <b>took a break</b> and drank some mate."</i> <span class="tag d">daily</span>
   <button class="say" data-say="Take a break. I was tired, so I took a break and drank some mate.">🔊</button></div>
 
-  <div class="card"><b>4. have a meeting / have a call</b> — tener una reunión / una llamada<br>
+  <div class="card"><b>4. have a meeting / have a call</b> — to attend or take part in a meeting or phone call<br>
   <i>"I <b>was having a call</b> when the internet died."</i> <span class="tag t">tech</span> <span class="tag d">daily</span>
   <button class="say" data-say="Have a meeting. I was having a call when the internet died.">🔊</button></div>
 
@@ -149,15 +149,15 @@
   <h2>3 · Phrasal Verbs for every day</h2>
   <span class="time">⏱ 6 min</span>
 
-  <div class="card"><b>1. log in / log out</b> — iniciar / cerrar sesión<br>
+  <div class="card"><b>1. log in / log out</b> — to enter / exit a system using your username and password<br>
   <i>"I <b>logged in</b>, but the system was very slow."</i>
   <button class="say" data-say="Log in. I logged in, but the system was very slow.">🔊</button></div>
 
-  <div class="card"><b>2. turn on / turn off</b> — encender / apagar<br>
+  <div class="card"><b>2. turn on / turn off</b> — to switch a device on / to switch a device off<br>
   <i>"I <b>turned off</b> my laptop and went for a walk."</i>
   <button class="say" data-say="Turn on. Turn off. I turned off my laptop and went for a walk.">🔊</button></div>
 
-  <div class="card"><b>3. look for</b> — buscar<br>
+  <div class="card"><b>3. look for</b> — to search for something<br>
   <i>"I <b>was looking for</b> the error when my boss called me."</i>
   <button class="say" data-say="Look for. I was looking for the error when my boss called me.">🔊</button></div>
 
@@ -215,7 +215,7 @@
 
   <div class="card" style="text-align:center;">
     <b>🎧 Listen to Vicky's story</b><br>
-    <div style="margin-top:8px;"><iframe width="300" height="60" src="https://vocaroo.com/embed/13J3bu82iPzw?autoplay=0" frameborder="0" allow="autoplay" style="max-width:100%;"></iframe><br><a href="https://vocaroo.com/13J3bu82iPzw" target="_blank">📍 Link</a></div>
+    <div style="margin-top:8px;"><iframe width="300" height="60" src="https://vocaroo.com/embed/13J3bu82iPzw?autoplay=0" frameborder="0" allow="autoplay" style="max-width:100%;"></iframe><br><a href="https://voca.ro/13J3bu82iPzw" title="Grabadora de voz de Vocaroo" target="_blank">Ver en Vocaroo &gt;&gt;</a></div>
   </div>
 
   <button class="action" onclick="toggleTranscript()">👩‍🏫 Show / hide transcript (teacher)</button>
